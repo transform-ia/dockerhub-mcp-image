@@ -43,6 +43,9 @@ COPY --from=builder /app/dist/ ./dist/
 # Install production dependencies only
 RUN npm ci --omit=dev && npm cache clean --force
 
+# Create logs directory for Winston logger
+RUN mkdir -p /app/logs
+
 # Set proper permissions
 RUN chown -R appuser:appgroup /app
 
