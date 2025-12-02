@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 
-FROM node:current-alpine3.22 AS builder
+FROM node:23.10.0-alpine3.22 AS builder
 WORKDIR /app
 
 COPY package.json .
@@ -29,7 +29,7 @@ COPY src/ ./src/
 
 RUN npm run build
 
-FROM node:current-alpine3.22
+FROM node:23.10.0-alpine3.22
 # Create app directory
 WORKDIR /app
 
@@ -40,14 +40,10 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist/ ./dist/
 
-# Install production dependencies only
-RUN npm ci --omit=dev && npm cache clean --force
-
-# Create logs directory for Winston logger
-RUN mkdir -p /app/logs
-
-# Set proper permissions
-RUN chown -R appuser:appgroup /app
+# Install production dependencies, create logs directory, and set permissions
+RUN npm ci --omit=dev && npm cache clean --force && \
+    mkdir -p /app/logs && \
+    chown -R appuser:appgroup /app
 
 # Switch to non-root user
 USER appuser

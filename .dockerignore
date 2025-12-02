@@ -1,0 +1,8 @@
+.git/
+.github/
+*.md
+LICENSE
+.gitignore
+.dockerignore
+node_modules/
+dist/
