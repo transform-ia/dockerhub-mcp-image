@@ -23,12 +23,9 @@ Images are tagged based on the git branch or tag:
 
 ## Supported Architectures
 
-Images are built for multiple architectures:
+Images are built for:
 
 - **linux/amd64** (Intel/AMD 64-bit)
-- **linux/arm64** (ARM 64-bit, including Apple Silicon, AWS Graviton)
-
-Docker will automatically pull the correct image for your platform.
 
 ## CI/CD Pipeline
 
@@ -52,7 +49,8 @@ The build workflow (`.github/workflows/docker-build.yml`) performs:
 
 ### Dockerfile Linting
 
-The linting workflow (`.github/workflows/lint-dockerfile.yml`) runs hadolint on every Dockerfile change to ensure best practices.
+The linting workflow (`.github/workflows/lint-dockerfile.yml`) runs hadolint on every Dockerfile
+change to ensure best practices.
 
 ## Using the Docker Image
 
@@ -98,17 +96,17 @@ docker run -it --rm \
 
 ```yaml
 services:
-  dockerhub-mcp:
-    image: ghcr.io/transform-ia/dockerhub-mcp:latest
-    environment:
-      - HUB_PAT_TOKEN=${HUB_PAT_TOKEN}
-    command:
-      - --transport=http
-      - --port=3000
-      - --username=${DOCKER_HUB_USERNAME}
-    ports:
-      - "3000:3000"
-    restart: unless-stopped
+    dockerhub-mcp:
+        image: ghcr.io/transform-ia/dockerhub-mcp:latest
+        environment:
+            - HUB_PAT_TOKEN=${HUB_PAT_TOKEN}
+        command:
+            - --transport=http
+            - --port=3000
+            - --username=${DOCKER_HUB_USERNAME}
+        ports:
+            - '3000:3000'
+        restart: unless-stopped
 ```
 
 ## Building Locally
@@ -124,21 +122,16 @@ services:
 docker build -t dockerhub-mcp:local .
 ```
 
-### Build Multi-Architecture Image
+### Build with Buildx
 
 ```bash
-# Create a new builder instance
-docker buildx create --name multiarch-builder --use
-
-# Build for multiple platforms
+# Build for amd64 platform
 docker buildx build \
-  --platform linux/amd64,linux/arm64 \
+  --platform linux/amd64 \
   -t dockerhub-mcp:local \
   --load \
   .
 ```
-
-**Note**: `--load` only works for single platform builds. For multi-platform, use `--push` to push directly to a registry.
 
 ## Release Process
 
@@ -146,21 +139,23 @@ docker buildx build \
 
 1. **Update version** in `package.json` (if needed)
 2. **Commit changes**:
-   ```bash
-   git add package.json
-   git commit -m "Bump version to 1.0.0"
-   ```
+
+    ```bash
+    git add package.json
+    git commit -m "Bump version to 1.0.0"
+    ```
 
 3. **Create and push git tag**:
-   ```bash
-   git tag v1.0.0
-   git push origin v1.0.0
-   ```
+
+    ```bash
+    git tag v1.0.0
+    git push origin v1.0.0
+    ```
 
 4. **GitHub Actions automatically**:
-   - Builds multi-arch image
-   - Tags as `v1.0.0`, `1.0.0`, `1.0`, `1`, and `latest`
-   - Pushes to GitHub Container Registry
+    - Builds multi-arch image
+    - Tags as `v1.0.0`, `1.0.0`, `1.0`, `1`, and `latest`
+    - Pushes to GitHub Container Registry
 
 ### Verifying the Release
 
@@ -223,6 +218,7 @@ Check the GitHub Actions logs:
 3. Expand failed step to see error details
 
 Common issues:
+
 - Dockerfile syntax errors (check hadolint workflow)
 - Network issues during build
 - GITHUB_TOKEN permissions (ensure `packages: write` is set)

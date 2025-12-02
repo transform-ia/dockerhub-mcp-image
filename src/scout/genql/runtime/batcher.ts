@@ -1,37 +1,35 @@
 // @ts-nocheck
-import type { GraphqlOperation } from './generateGraphqlOperation'
-import { GenqlError } from './error'
+import type { GraphqlOperation } from './generateGraphqlOperation';
+import { GenqlError } from './error';
 
-type Variables = Record<string, any>
+type Variables = Record<string, any>;
 
 type QueryError = Error & {
-    message: string
+    message: string;
 
     locations?: Array<{
-        line: number
-        column: number
-    }>
-    path?: any
-    rid: string
-    details?: Record<string, any>
-}
+        line: number;
+        column: number;
+    }>;
+    path?: any;
+    rid: string;
+    details?: Record<string, any>;
+};
 type Result = {
-    data: Record<string, any>
-    errors: Array<QueryError>
-}
-type Fetcher = (
-    batchedQuery: GraphqlOperation | Array<GraphqlOperation>,
-) => Promise<Array<Result>>
+    data: Record<string, any>;
+    errors: Array<QueryError>;
+};
+type Fetcher = (batchedQuery: GraphqlOperation | Array<GraphqlOperation>) => Promise<Array<Result>>;
 type Options = {
-    batchInterval?: number
-    shouldBatch?: boolean
-    maxBatchSize?: number
-}
+    batchInterval?: number;
+    shouldBatch?: boolean;
+    maxBatchSize?: number;
+};
 type Queue = Array<{
-    request: GraphqlOperation
-    resolve: (...args: Array<any>) => any
-    reject: (...args: Array<any>) => any
-}>
+    request: GraphqlOperation;
+    resolve: (...args: Array<any>) => any;
+    reject: (...args: Array<any>) => any;
+}>;
 
 /**
  * takes a list of requests (queue) and batches them into a single server request.
@@ -41,47 +39,44 @@ type Queue = Array<{
  * @param {Queue} queue  - the list of requests to batch
  */
 function dispatchQueueBatch(client: QueryBatcher, queue: Queue): void {
-    let batchedQuery: any = queue.map((item) => item.request)
+    let batchedQuery: any = queue.map((item) => item.request);
 
     if (batchedQuery.length === 1) {
-        batchedQuery = batchedQuery[0]
+        batchedQuery = batchedQuery[0];
     }
     (() => {
         try {
             return client.fetcher(batchedQuery);
-        } catch(e) {
+        } catch (e) {
             return Promise.reject(e);
         }
-    })().then((responses: any) => {
-        if (queue.length === 1 && !Array.isArray(responses)) {
-            if (responses.errors && responses.errors.length) {
-                queue[0].reject(
-                    new GenqlError(responses.errors, responses.data),
-                )
-                return
+    })()
+        .then((responses: any) => {
+            if (queue.length === 1 && !Array.isArray(responses)) {
+                if (responses.errors && responses.errors.length) {
+                    queue[0].reject(new GenqlError(responses.errors, responses.data));
+                    return;
+                }
+
+                queue[0].resolve(responses);
+                return;
+            } else if (responses.length !== queue.length) {
+                throw new Error('response length did not match query length');
             }
 
-            queue[0].resolve(responses)
-            return
-        } else if (responses.length !== queue.length) {
-            throw new Error('response length did not match query length')
-        }
-
-        for (let i = 0; i < queue.length; i++) {
-            if (responses[i].errors && responses[i].errors.length) {
-                queue[i].reject(
-                    new GenqlError(responses[i].errors, responses[i].data),
-                )
-            } else {
-                queue[i].resolve(responses[i])
+            for (let i = 0; i < queue.length; i++) {
+                if (responses[i].errors && responses[i].errors.length) {
+                    queue[i].reject(new GenqlError(responses[i].errors, responses[i].data));
+                } else {
+                    queue[i].resolve(responses[i]);
+                }
             }
-        }
-    })
-    .catch((e) => {
-        for (let i = 0; i < queue.length; i++) {
-            queue[i].reject(e)
-        }
-    });
+        })
+        .catch((e) => {
+            for (let i = 0; i < queue.length; i++) {
+                queue[i].reject(e);
+            }
+        });
 }
 
 /**
@@ -91,19 +86,16 @@ function dispatchQueueBatch(client: QueryBatcher, queue: Queue): void {
  * @param {Options} options - the options for the batch
  */
 function dispatchQueue(client: QueryBatcher, options: Options): void {
-    const queue = client._queue
-    const maxBatchSize = options.maxBatchSize || 0
-    client._queue = []
+    const queue = client._queue;
+    const maxBatchSize = options.maxBatchSize || 0;
+    client._queue = [];
 
     if (maxBatchSize > 0 && maxBatchSize < queue.length) {
         for (let i = 0; i < queue.length / maxBatchSize; i++) {
-            dispatchQueueBatch(
-                client,
-                queue.slice(i * maxBatchSize, (i + 1) * maxBatchSize),
-            )
+            dispatchQueueBatch(client, queue.slice(i * maxBatchSize, (i + 1) * maxBatchSize));
         }
     } else {
-        dispatchQueueBatch(client, queue)
+        dispatchQueueBatch(client, queue);
     }
 }
 /**
@@ -131,25 +123,21 @@ function dispatchQueue(client: QueryBatcher, options: Options): void {
  */
 
 export class QueryBatcher {
-    fetcher: Fetcher
-    _options: Options
-    _queue: Queue
+    fetcher: Fetcher;
+    _options: Options;
+    _queue: Queue;
 
     constructor(
         fetcher: Fetcher,
-        {
-            batchInterval = 6,
-            shouldBatch = true,
-            maxBatchSize = 0,
-        }: Options = {},
+        { batchInterval = 6, shouldBatch = true, maxBatchSize = 0 }: Options = {}
     ) {
-        this.fetcher = fetcher
+        this.fetcher = fetcher;
         this._options = {
             batchInterval,
             shouldBatch,
             maxBatchSize,
-        }
-        this._queue = []
+        };
+        this._queue = [];
     }
 
     /**
@@ -179,19 +167,19 @@ export class QueryBatcher {
         query: string,
         variables?: Variables,
         operationName?: string,
-        overrides: Options = {},
+        overrides: Options = {}
     ): Promise<Result> {
         const request: GraphqlOperation = {
             query,
-        }
-        const options = Object.assign({}, this._options, overrides)
+        };
+        const options = Object.assign({}, this._options, overrides);
 
         if (variables) {
-            request.variables = variables
+            request.variables = variables;
         }
 
         if (operationName) {
-            request.operationName = operationName
+            request.operationName = operationName;
         }
 
         const promise = new Promise<Result>((resolve, reject) => {
@@ -199,20 +187,17 @@ export class QueryBatcher {
                 request,
                 resolve,
                 reject,
-            })
+            });
 
             if (this._queue.length === 1) {
                 if (options.shouldBatch) {
-                    setTimeout(
-                        () => dispatchQueue(this, options),
-                        options.batchInterval,
-                    )
+                    setTimeout(() => dispatchQueue(this, options), options.batchInterval);
                 } else {
-                    dispatchQueue(this, options)
+                    dispatchQueue(this, options);
                 }
             }
-        })
-        return promise
+        });
+        return promise;
     }
 
     /**
@@ -242,34 +227,34 @@ export class QueryBatcher {
         query: string,
         variables?: Variables,
         operationName?: string,
-        overrides: Options = {},
+        overrides: Options = {}
     ): Promise<Result> {
         const request: GraphqlOperation = {
             query,
-        }
+        };
         const options = Object.assign({}, this._options, overrides, {
             shouldBatch: false,
-        })
+        });
 
         if (variables) {
-            request.variables = variables
+            request.variables = variables;
         }
 
         if (operationName) {
-            request.operationName = operationName
+            request.operationName = operationName;
         }
 
         const promise = new Promise<Result>((resolve, reject) => {
-            const client = new QueryBatcher(this.fetcher, this._options)
+            const client = new QueryBatcher(this.fetcher, this._options);
             client._queue = [
                 {
                     request,
                     resolve,
                     reject,
                 },
-            ]
-            dispatchQueue(client, options)
-        })
-        return promise
+            ];
+            dispatchQueue(client, options);
+        });
+        return promise;
     }
 }
