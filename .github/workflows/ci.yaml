@@ -16,7 +16,7 @@ jobs:
       image: ghcr.io/transform-ia/claude-image:0.1.2
       credentials:
         username: ${{ github.actor }}
-        password: ${{ secrets.GH_PAT }}
+        password: ${{ secrets.GITHUB_TOKEN }}
       options: --user 0
     steps:
       - uses: actions/checkout@v6
