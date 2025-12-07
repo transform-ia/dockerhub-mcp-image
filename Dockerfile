@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 
-FROM node:23.10.0-alpine3.22 AS builder
+FROM node:22-alpine3.23 AS builder
 WORKDIR /app
 
 COPY package.json .
@@ -29,7 +29,7 @@ COPY src/ ./src/
 
 RUN npm run build
 
-FROM node:23.10.0-alpine3.22
+FROM node:22-alpine3.23
 # Create app directory
 WORKDIR /app
 

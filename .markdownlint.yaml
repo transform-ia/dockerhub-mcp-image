@@ -1,13 +1,4 @@
-# Markdownlint configuration
 ---
-# MD013 - Line length
-MD013: false
-
-# MD033 - Inline HTML (needed for tables and complex formatting)
-MD033: false
-
-# MD034 - Bare URLs (allow bare URLs for reference)
-MD034: false
-
-# MD046 - Code block style (allow both fenced and indented)
-MD046: false
+default: true
+MD013:
+  line_length: 140

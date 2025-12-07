@@ -73,40 +73,12 @@ pull request is not accepted on the first try, don't get discouraged!
 
 ### Talking to other Docker users and contributors
 
-<table class="tg">
-  <col width="45%">
-  <col width="65%">
-  <tr>
-    <td>Community Slack</td>
-    <td>
-      The Docker Community has a dedicated Slack chat to discuss features and issues.  You can sign-up <a href="https://www.docker.com/community/" target="_blank">with this link</a>.
-    </td>
-  </tr>
-  <tr>
-    <td>Forums</td>
-    <td>
-      A public forum for users to discuss questions and explore current design patterns and
-      best practices about Docker and related projects in the Docker Ecosystem. To participate,
-      just log in with your Docker Hub account on <a href="https://forums.docker.com" target="_blank">https://forums.docker.com</a>.
-    </td>
-  </tr>
-  <tr>
-    <td>Twitter</td>
-    <td>
-      You can follow <a href="https://twitter.com/docker/" target="_blank">Docker's Twitter feed</a>
-      to get updates on our products. You can also tweet us questions or just
-      share blogs or stories.
-    </td>
-  </tr>
-  <tr>
-    <td>Stack Overflow</td>
-    <td>
-      Stack Overflow has over 17000 Docker questions listed. We regularly
-      monitor <a href="https://stackoverflow.com/questions/tagged/docker" target="_blank">Docker questions</a>
-      and so do many other knowledgeable Docker users.
-    </td>
-  </tr>
-</table>
+| Channel | Description |
+| ------- | ----------- |
+| Community Slack | The Docker Community has a dedicated Slack chat to discuss features and issues. You can sign-up at <https://www.docker.com/community/>. |
+| Forums | A public forum for users to discuss questions and explore current design patterns and best practices about Docker and related projects in the Docker Ecosystem. To participate, just log in with your Docker Hub account on <https://forums.docker.com>. |
+| Twitter | You can follow [Docker's Twitter feed](https://twitter.com/docker/) to get updates on our products. You can also tweet us questions or just share blogs or stories. |
+| Stack Overflow | Stack Overflow has over 17000 Docker questions listed. We regularly monitor [Docker questions](https://stackoverflow.com/questions/tagged/docker) and so do many other knowledgeable Docker users. |
 
 ### Conventions
 
@@ -200,7 +172,9 @@ By making a contribution to this project, I certify that:
 
 Then you just add a line to every git commit message:
 
-    Signed-off-by: Joe Smith <joe.smith@email.com>
+```text
+Signed-off-by: Joe Smith <joe.smith@email.com>
+```
 
 Use your real name (sorry, no pseudonyms or anonymous contributions.)
 

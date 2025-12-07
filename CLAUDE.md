@@ -2,7 +2,9 @@
 
 ## Repository Purpose
 
-MCP (Model Context Protocol) server providing Docker Hub integration. Built with TypeScript/Node.js. Exposes Docker Hub operations for repositories, tags, and images.
+MCP (Model Context Protocol) server providing Docker Hub integration. Built with
+TypeScript/Node.js. Exposes Docker Hub operations for repositories, tags, and
+images.
 
 ## Plugin Usage
 
